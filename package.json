@@ -1,0 +1,39 @@
+{
+  "name": "gta-cli",
+  "version": "2.1.0",
+  "description": "GTA - Git & Task Automation CLI (Modern Node.js version)",
+  "type": "module",
+  "bin": {
+    "gta": "./index.js"
+  },
+  "scripts": {
+    "dev": "node index.js",
+    "link": "npm link",
+    "unlink": "npm unlink -g gta-cli"
+  },
+  "keywords": [
+    "git",
+    "automation",
+    "cli",
+    "task",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "blessed": "^0.1.81",
+    "blessed-xterm": "^1.5.1",
+    "commander": "^12.0.0",
+    "conf": "^13.0.1",
+    "execa": "^9.5.2",
+    "neo-blessed": "^0.2.0",
+    "node-pty": "^1.1.0",
+    "picocolors": "^1.1.1",
+    "term.js": "^0.0.7",
+    "zod": "^3.22.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

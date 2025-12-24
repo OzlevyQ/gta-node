@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GTA - Git & Task Automation</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <h1>GTA Control Panel</h1>
+        <p>Git & Task Automation</p>
+      </div>
+      <div class="header-right">
+        <button class="watch-toggle" id="watch-toggle">
+          <span class="watch-indicator"></span>
+          <span id="watch-text">Start Watch</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+      <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+      <button class="nav-btn" data-page="git">Git Operations</button>
+      <button class="nav-btn" data-page="config">Configuration</button>
+      <button class="nav-btn" data-page="activity">Activity Log</button>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard-page" class="content">
+      <div class="content-main">
+        <!-- Repository Info -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Repository</h2>
+            <div class="card-actions">
+              <button class="btn btn-small btn-secondary" id="refresh-btn">Refresh</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="info-grid" id="repo-info">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Quick Actions</h2>
+          </div>
+          <div class="card-body">
+            <div class="btn-group">
+              <button class="btn" id="quick-commit-btn">Commit Changes</button>
+              <button class="btn btn-success" id="quick-push-btn">Push</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Commits -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Commits</h2>
+          </div>
+          <div class="card-body">
+            <div class="commits-log" id="commits-log">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-sidebar">
+        <!-- Automation Status -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Automation</h2>
+          </div>
+          <div class="card-body">
+            <div class="info-grid" id="automation-info">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Activity</h2>
+            <div class="card-actions">
+              <button class="btn btn-small btn-secondary" id="clear-log-btn">Clear</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="activity-log" id="activity-log">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Git Operations Page -->
+    <div id="git-page" class="content single-column hidden">
+      <div class="content-main">
+        <!-- Branch Management -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Branch Management</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Current Branch</label>
+              <div id="current-branch" class="info-value">-</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Switch to Branch</label>
+              <select class="select" id="branch-select">
+                <option>Loading...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Create New Branch</label>
+              <input type="text" class="input" id="new-branch-name" placeholder="feature/my-branch">
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-secondary" id="switch-branch-btn">Switch Branch</button>
+              <button class="btn" id="create-branch-btn">Create Branch</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commit & Push -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Commit & Push</h2>
+          </div>
+          <div class="card-body">
+            <div class="info-grid mb-4">
+              <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value" id="git-status">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Changed Lines</span>
+                <span class="info-value" id="git-changes">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Unpushed Commits</span>
+                <span class="info-value" id="git-unpushed">-</span>
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn" id="generate-commit-btn">AI Commit</button>
+              <button class="btn btn-secondary" id="manual-commit-btn">Manual Commit</button>
+              <button class="btn btn-success" id="push-btn">Push</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remote -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Remote</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Remote URL</label>
+              <input type="text" class="input" id="remote-url" placeholder="git@github.com:user/repo.git">
+            </div>
+            <button class="btn btn-secondary" id="set-remote-btn">Set Remote</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuration Page -->
+    <div id="config-page" class="content single-column hidden">
+      <div class="content-main">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Configuration</h2>
+            <div class="card-actions">
+              <button class="btn btn-small" id="save-config-btn">Save Changes</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Automation Mode</label>
+              <select class="select" id="config-autoMode">
+                <option value="manual">Manual</option>
+                <option value="confirm">Confirm</option>
+                <option value="auto">Auto</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Commit Threshold (lines)</label>
+              <input type="number" class="input" id="config-commitThreshold" min="1">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">AI Provider</label>
+              <select class="select" id="config-aiProvider">
+                <option value="none">None</option>
+                <option value="gemini">Gemini</option>
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic</option>
+                <option value="ollama">Ollama</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">AI Model</label>
+              <input type="text" class="input" id="config-aiModel" placeholder="gemini-2.0-flash-exp">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">AI Commit Messages</label>
+              <select class="select" id="config-aiCommitMessages">
+                <option value="true">Enabled</option>
+                <option value="false">Disabled</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Commits Before Summary</label>
+              <input type="number" class="input" id="config-commitsBeforeSummary" min="2" max="10">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Auto Summary & Push</label>
+              <select class="select" id="config-autoSummaryAndPush">
+                <option value="true">Enabled</option>
+                <option value="false">Disabled</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Default Branch</label>
+              <input type="text" class="input" id="config-defaultBranch" placeholder="main">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Log Page -->
+    <div id="activity-page" class="content single-column hidden">
+      <div class="content-main">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Activity Log</h2>
+            <div class="card-actions">
+              <button class="btn btn-small btn-secondary" id="clear-activity-btn">Clear All</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="activity-log" id="full-activity-log" style="max-height: 600px;">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for push confirmation -->
+  <div id="push-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Push Confirmation</h3>
+      </div>
+      <div class="modal-body">
+        <p id="push-summary"></p>
+        <div class="commits-log mt-4" id="push-commits" style="max-height: 200px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="push-cancel">Cancel</button>
+        <button class="btn btn-success" id="push-confirm">Push</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
