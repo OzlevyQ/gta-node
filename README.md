@@ -1,330 +1,164 @@
-# GTA 2.0 - Git & Task Automation CLI
+# 🚀 GTA 2.1 — Git & Task Automation CLI
 
-Modern Node.js version of GTA built with **Commander.js**, **Clack**, and **Gemini AI**.
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg?style=for-the-badge)](https://github.com/OzlevyQ/gta-node)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-orange.svg?style=for-the-badge)](https://nodejs.org/)
+[![AI](https://img.shields.io/badge/AI-Powered-purple.svg?style=for-the-badge)](https://ai.google.dev/)
 
-## Features
+**GTA** is a premium, all-in-one Git automation suite built for developers who want to stay in the flow. It combines a beautiful TUI, a high-performance Web Dashboard, and intelligent AI automation to handle your boilerplate Git tasks effortlessly.
 
-- 🎨 Beautiful, modern CLI interface with **Clack prompts**
-- 🌐 **Web Interface** - Full-featured web dashboard with real-time updates
-- ⚡ Fast and lightweight
-- 🔄 Auto-commit and push automation
-- 🤖 **AI-powered commit messages with Gemini**
-- 📝 **Smart commit summaries** - Groups commits and asks before pushing
-- 🌐 GitHub integration with automatic repository creation
-- 🔧 **Auto GitHub CLI Setup** - Automatically detects, installs, and configures GitHub CLI
-- 🚀 **Instant project initialization** - `gta add` sets up everything automatically
-- 📦 Easy global installation
-- 💻 Pure HTML & JavaScript - No frameworks, lightweight and fast
+---
 
+## ✨ Features that Wow
 
-## Installation
+*   🎨 **Modern TUI & UI**: Built with Clack prompts for a premium terminal experience.
+*   🤖 **AI-Driven Workflow**: Intelligent commit messages and change summaries powered by **Gemini 2.0**.
+*   🌐 **Web Dashboard**: A lightweight, real-time web interface to manage your repositories from the browser.
+*   📦 **Auto-Setup System**: Intelligent detection and installation of **GitHub CLI** across all platforms.
+*   🔄 **Smart Automation**: Auto-commit when you're ready, with threshold-based logic and batched summaries.
+*   🚀 **One-Command Setup**: `gta add` turns any folder into a GitHub-connected repository in seconds.
+*   💻 **Zero-Bloat**: Built with vanilla technologies. No heavy frameworks, just pure performance.
 
-### From Source
+---
 
+## 📦 Installation
+
+GTA is designed to work seamlessly on **macOS**, **Linux**, and **Windows**.
+
+### 1. Prerequisite: Node.js
+Ensure you have **Node.js v18** or newer installed.
+
+### 2. Install GTA from Source
 ```bash
+git clone https://github.com/OzlevyQ/gta-node.git
 cd gta-node
 npm install
 npm link
 ```
 
-### Verify Installation
+### 3. Optional Enhancements
+GTA works best with these tools (though it can install `gh` for you):
+*   **GitHub CLI (`gh`)**: For repository automation.
+*   **fzf**: For enhanced fuzzy finding in the terminal.
 
+---
+
+## 🌍 Platform Specifics
+
+| Platform | Recommended Setup | Command |
+| :--- | :--- | :--- |
+| **🍏 macOS** | Homebrew | `brew install node gh fzf` |
+| **🐧 Linux** | Native PM | `sudo apt/dnf/pacman -S nodejs gh fzf` |
+| **🪟 Windows** | Winget | `winget install OpenJS.NodeJS GitHub.cli` |
+
+---
+
+## 🚦 Quick Start
+
+### 🤖 Step 1: Initialize AI (Gemini)
+GTA uses Gemini AI for generating commit messages. It's fast, free, and smart.
 ```bash
-gta --version
-gta --help
-```
-
-## Quick Start
-
-### Setup Gemini AI (Recommended)
-
-GTA uses Gemini AI by default for intelligent commit messages and summaries:
-
-```bash
-# Install Gemini CLI
+# Install the Google AI CLI
 npm install -g @google/generative-ai-cli
 
-# Authenticate (first time only)
+# Login to your account
 gemini auth login
-
-# Verify it works
-gta status  # Should show "AI Provider: gemini"
 ```
 
-### GitHub CLI Auto-Setup
+### 🔐 Step 2: Automatic GitHub CLI Setup
+Just run any command that interacts with GitHub. GTA will detect if you have `gh` and guide you through a **full visual installation**:
 
-GTA automatically checks for GitHub CLI (`gh`) when you run commands that need it. If it's not installed or not authenticated, GTA will guide you through the setup:
-
-**What happens automatically:**
-1. 🔍 **Detection**: Checks if `gh` is installed
-2. 💻 **OS Detection**: Identifies your operating system (macOS, Linux, Windows)
-3. 📦 **Installation**: Offers to install `gh` using the appropriate package manager:
-   - **macOS**: `brew install gh` (requires Homebrew)
-   - **Linux**: Distribution-specific command (apt, dnf, pacman)
-   - **Windows**: `winget install --id GitHub.cli`
-4. 🔐 **Authentication**: Guides you through `gh auth login` if not authenticated
-
-**Example workflow:**
 ```bash
-# First time running a GitHub command
 gta add
-
-# GTA automatically checks:
-# ⚠ GitHub CLI (gh) is not installed
-# GitHub CLI is required for repository operations
-# 
-# ❯ Would you like to install GitHub CLI now? (y/n)
-# 
-# [After installation]
-# ⚠ You are not authenticated with GitHub
-# Authentication is required to create and manage repositories
-# 
-# ❯ Would you like to authenticate with GitHub now? (y/n)
 ```
 
-**Manual setup:**
-```bash
-# Check GitHub CLI status
-gta status  # Shows installation and authentication status
+**What happens next?**
+1.  🔍 GTA detects your OS and missing tools.
+2.  🛠️ Offers to install `gh` via `brew`, `apt`, `dnf`, `pacman`, or `winget`.
+3.  🔄 Shows **real-time installation progress** in your terminal.
+4.  🔐 Guides you through the browser-based OAuth login.
+5.  ✅ Verifies everything and continues your command.
 
-# Manual installation (if needed)
-# macOS:
-brew install gh
+---
 
-# Manual authentication
-gh auth login
-```
+## 🛠️ Core Commands
 
-### Basic Usage
+### 🚀 `gta add` — The Magic Command
+The fastest way to take a project online.
+*   🤖 AI generates project description & README.
+*   📁 Creates `.gitignore`.
+*   🔧 Initializes Git.
+*   🤖 AI generates the initial commit message.
+*   🌐 Creates a GitHub repository (Public/Private).
+*   🚀 Pushes everything.
 
-```bash
-# Add current folder to GitHub (AI-powered)
-cd your-project/
-gta add
+### 📊 `gta status` — The Command Center
+Shows "everything" in one view:
+*   **Git Status**: Branch, changes, sync state.
+*   **Automation**: Mode, thresholds, summaries.
+*   **AI**: Provider status and current model.
+*   **System**: Tool paths and versions.
 
-# Interactive mode
-gta tui
+### ⌚ `gta watch` — The Invisible Assistant
+Monitors your work in the background.
+1.  Watches for changes (default: every 3s).
+2.  Creates an AI-powered commit after **20 lines** of change.
+3.  After **3 commits**, it summarizes everything and asks: *"Push these 3 changes to remote?"*
 
-# Start auto-commit watcher
-gta watch
+### 🎮 `gta tui` — The Command Deck
+A full-screen interactive interface for everything. Navigate with arrows, manage with ease.
 
-# Show status
-gta status
-```
+### 🌐 `gta web` — The Global Dashboard
+Launches a modern web interface on `localhost:3000`. Perfect for developers who prefer a visual overview.
 
-### How It Works
+---
 
-1. **Auto-commit**: When changes exceed threshold (default: 20 lines), GTA creates a commit with AI-generated message
-2. **Smart summaries**: After 3 commits (configurable), Gemini summarizes all changes
-3. **Confirm before push**: You review the summary and decide whether to push
+## ⚙️ Configuration
 
-## Commands
-
-### Interactive Mode
+Configuration is stored in `~/.config/gta/config.json`. You can manage it via CLI:
 
 ```bash
-gta tui     # Launch interactive TUI
-gta run     # Alias for 'gta tui'
+gta config show          # See everything
+gta config set autoMode manual  # Change automation style
+gta config set commitThreshold 50 # Be less aggressive with commits
 ```
 
-### Quick Project Setup
+| Key | Default | Description |
+| :--- | :--- | :--- |
+| `autoMode` | `auto` | `manual` \| `confirm` \| `auto` |
+| `commitThreshold` | `20` | Lines changed before a commit |
+| `commitsBeforeSummary` | `3` | Number of commits before a push prompt |
+| `aiProvider` | `gemini` | AI engine used for messages |
+
+---
+
+## 🧪 Testing the Setup Flow
+
+We've built a dedicated tool to test the GitHub CLI setup without affecting your projects:
 
 ```bash
-# Add current folder to GitHub (recommended!)
-cd your-project/
-gta add                     # AI generates description & README
-gta add --private           # Create private repo
-gta add --no-ai             # Skip AI generation
+node test-gh-setup.js
 ```
 
-What `gta add` does:
-- 🤖 AI generates project description and README
-- 📁 Creates .gitignore
-- 🔧 Initializes git repository
-- 🤖 AI generates initial commit message
-- 🌐 Creates GitHub repository
-- 🚀 Pushes everything automatically
+---
 
-### Project Scaffolding (Advanced)
+## 🛠️ Tech Stack
 
-```bash
-gta project                 # Interactive project creation
-gta project --name my-app   # Create with specific name
-```
+*   **Commander.js**: Robust CLI framework.
+*   **Clack**: Next-gen interactive prompts.
+*   **Execa**: High-performance process execution.
+*   **Conf + Zod**: Type-safe configuration management.
+*   **Vanilla Web**: Lightweight HTML/JS dashboard with zero framework overhead.
 
-Creates new projects with:
-- README.md and .gitignore
-- Optional package.json
-- Git initialization
-- GitHub repository creation (requires gh CLI)
+---
 
-### Repository Management
+## 📄 License
+GTA 2.1 is open-source software licensed under the **MIT License**.
 
-```bash
-gta init                    # Initialize git repository
-gta status                  # Show complete status and configuration
-gta status --all            # Show extended information
-```
+---
 
-### Configuration
-
-```bash
-gta config show             # Show all configuration
-gta config get <key>        # Get specific value
-gta config set <key> <val>  # Set configuration value
-gta config edit             # Edit config file
-gta config reset            # Reset to defaults
-```
-
-### Git Operations
-
-```bash
-gta git switch <ref>        # Switch branch/commit
-gta git branch              # Branch operations
-```
-
-### Automation & Watching
-
-```bash
-gta watch                   # Watch for changes and auto-commit
-gta watch --once            # Check once and exit
-gta watch --interval 5      # Custom check interval (seconds)
-```
-
-**How watch mode works:**
-1. Monitors for changes every 3 seconds (customizable)
-2. When changes exceed threshold (20 lines), creates commit with AI-generated message
-3. After 3 commits, Gemini generates a summary
-4. Asks you: "Push 3 commits to remote?" with the summary
-5. You decide whether to push based on the summary
-
-**Example workflow:**
-```bash
-cd my-project/
-gta watch
-
-# ... you code ...
-# ✓ Committed: feat(auth): implement JWT token validation
-# ✓ Committed: fix(api): handle edge case in user lookup
-# ✓ Committed: refactor(auth): extract token helper functions
-#
-# ━━━ 3 Unpushed Commits ━━━
-# 📝 Summary: Added JWT authentication with proper error handling
-#             and refactored token utilities for reusability
-# ❯ Push 3 commits to remote? (y/n)
-```
-
-### Web Interface
-
-Launch a full-featured web dashboard:
-
-```bash
-gta web                     # Launch web interface on port 3000
-gta web -p 8080             # Use custom port
-gta web --no-open           # Don't open browser automatically
-```
-
-**Features:**
-- 📊 Real-time dashboard with repository status
-- 💾 Quick commit and push buttons
-- 📜 Recent commits log viewer
-- ⚙️ Configuration viewer
-- 👤 Profile page with personal settings
-- 🔄 Auto-refresh every 5 seconds
-- 🎨 Modern, responsive design
-- 🚀 Pure HTML & JavaScript - no frameworks
-
-**Access from TUI:**
-```bash
-gta tui
-# Select: 🌐 Web — open web interface
-```
-
-### Other Commands
-
-```bash
-gta github connect          # Connect to GitHub
-gta ai set-provider <name>  # Set AI provider
-```
-
-## Configuration
-
-Configuration is stored in: `~/.config/gta/config.json`
-
-### Core Settings
-
-- **`autoMode`**: `manual` | `confirm` | `auto` (default: `auto`)
-  - Controls automatic commit behavior
-
-- **`commitThreshold`**: number (default: `20`)
-  - Minimum lines changed before creating commit
-
-- **`aiProvider`**: `gemini` | `openai` | `anthropic` | `ollama` | `none` (default: `gemini`)
-  - AI provider for commit messages and summaries
-
-- **`aiModel`**: string (default: `gemini-2.0-flash-exp`)
-  - Specific AI model to use
-
-### AI Settings
-
-- **`aiCommitMessages`**: boolean (default: `true`)
-  - Generate commit messages with AI
-
-- **`aiCommitStyle`**: string (default: `conventional`)
-  - Commit message style (conventional commits format)
-
-- **`aiCommitMaxChars`**: number (default: `72`)
-  - Maximum commit message length
-
-### Smart Push Settings
-
-- **`commitsBeforeSummary`**: number 2-10 (default: `3`)
-  - How many commits before generating summary and asking to push
-
-- **`autoSummaryAndPush`**: boolean (default: `true`)
-  - Enable automatic summarization after N commits
-
-### Other Settings
-
-- **`defaultBranch`**: string (default: `main`)
-- **`pushOnCommit`**: boolean (default: `false`)
-  - Auto-push immediately after each commit (not recommended with smart summaries)
-
-### Configuration Commands
-
-```bash
-gta config show                      # View all settings
-gta config set autoMode auto         # Enable auto-commit
-gta config set commitThreshold 30    # Change threshold
-gta config set commitsBeforeSummary 5  # Summarize after 5 commits
-gta config set aiProvider gemini     # Set AI provider
-```
-
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Run locally
-npm run dev
-
-# Link globally for testing
-npm link
-
-# Unlink
-npm unlink -g gta-cli
-```
-
-## Technology Stack
-
-- **Commander.js** - CLI framework
-- **Clack** - Interactive prompts
-- **Execa** - Process execution
-- **Conf** - Configuration management
-- **Picocolors** - Terminal colors
-- **Zod** - Schema validation
-
-## License
-
-MIT
+<p align="center">
+  Built with ❤️ by the GTA Team. 
+  <br>
+  <i>"Automate the boring, focus on the code."</i>
+</p>

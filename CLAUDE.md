@@ -1,4 +1,4 @@
-# GTA Node.js - Claude Code Reference
+#GTA Node.js - Claude Code Reference
 
 This document helps Claude Code understand the GTA (Git & Task Automation) Node.js codebase architecture and implementation patterns.
 
