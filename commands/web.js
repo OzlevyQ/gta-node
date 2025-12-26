@@ -80,10 +80,8 @@ async function startCloudflaredTunnel(port) {
     });
 
     // Listen to output to catch the tunnel URL
-    cloudflaredProcess.stdout.on('data', (data) => {
+    const parseOutput = (data) => {
       const output = data.toString();
-
-      // Look for the tunnel URL in the output
       const match = output.match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/);
       if (match && !tunnelUrl) {
         tunnelUrl = match[0];
@@ -92,11 +90,18 @@ async function startCloudflaredTunnel(port) {
         console.log();
         activityLogger.success(`Cloudflare tunnel started: ${tunnelUrl}`);
       }
-    });
+    };
 
+    cloudflaredProcess.stdout.on('data', parseOutput);
+
+    // Cloudflared often interprets "info" logs as stderr
     cloudflaredProcess.stderr.on('data', (data) => {
       const output = data.toString();
-      // Only show errors, not info messages
+
+      // Parse for URL in stderr too
+      parseOutput(data);
+
+      // Only show actual errors, not info messages
       if (output.includes('ERR') || output.includes('error')) {
         // console.error(pc.red(`  Cloudflared: ${output.trim()}`));
       }
