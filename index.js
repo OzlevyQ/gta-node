@@ -21,6 +21,8 @@ import { watchCommand } from './commands/watch.js';
 import { tuiCommand } from './commands/tui.js';
 import { projectCommand } from './commands/project.js';
 import { addCommand } from './commands/add.js';
+import { cloneCommand } from './commands/clone.js';
+import { flowCommand } from './commands/flow.js';
 import { webCommand } from './commands/web.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,6 +43,7 @@ program
 // Setup GitHub CLI middleware
 setupGhMiddleware(program);
 
+
 // Register commands
 initCommand(program);
 statusCommand(program);
@@ -52,6 +55,8 @@ watchCommand(program);
 tuiCommand(program);
 projectCommand(program);
 addCommand(program);
+cloneCommand(program);
+flowCommand(program);
 webCommand(program);
 
 // Parse arguments

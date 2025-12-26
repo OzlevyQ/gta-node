@@ -39,6 +39,8 @@ gta-node/
 │   ├── tui.js           # Interactive TUI interface
 │   ├── project.js       # Project scaffolding
 │   ├── add.js           # Quick project setup (git + GitHub)
+│   ├── clone.js         # ⭐ NEW: Smart clone & setup
+│   ├── flow.js          # ⭐ NEW: Standard workflows (start, sync, pr)
 │   └── web.js           # Web interface
 ├── lib/                  # Core library modules
 │   ├── config.js        # Configuration management (Conf + Zod)

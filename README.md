@@ -1,11 +1,15 @@
-# 🚀 GTA 2.1 — Git & Task Automation CLI
+# 🚀 GTA 2.1
+
+## Git & Task Automation CLI
+
+![GTA Precise UI Showcase](assets/final_showcase.png)
 
 [![Version](https://img.shields.io/badge/version-2.1.0-blue.svg?style=for-the-badge)](https://github.com/OzlevyQ/gta-node)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-orange.svg?style=for-the-badge)](https://nodejs.org/)
 [![AI](https://img.shields.io/badge/AI-Powered-purple.svg?style=for-the-badge)](https://ai.google.dev/)
 
-**GTA** is a premium, all-in-one Git automation suite built for developers who want to stay in the flow. It combines a beautiful TUI, a high-performance Web Dashboard, and intelligent AI automation to handle your boilerplate Git tasks effortlessly.
+**GTA (Git & Task Automation)** is a premium, all-in-one Git automation suite built for developers who want to stay in the flow. It combines a beautiful TUI, a high-performance Web Dashboard, and intelligent AI automation to handle your boilerplate Git tasks effortlessly.
 
 ---
 
@@ -112,6 +116,46 @@ A full-screen interactive interface for everything. Navigate with arrows, manage
 Launches a modern web interface on `localhost:3000`. Perfect for developers who prefer a visual overview.
 
 ---
+
+## 🏢 Enterprise Workflow Features
+
+### Smart Cloning
+```bash
+gta clone <repo>
+```
+Not just a `git clone`. GTA will:
+- Clone the repository.
+- Detect package manager and offer to install dependencies.
+- Open the project in your editor.
+- **Project Signature**: Detect and apply `.gta/config.json` settings automatically.
+
+### Standardized Workflows
+GTA forces a clean, professional git flow without the hassle.
+
+```bash
+# Start a new task (enforces naming like feature/login-page)
+gta start [name]
+
+# Sync with remote (uses pull --rebase to keep history clean)
+gta sync
+
+# Create a PR (pushes branch and opens GitHub PR page)
+gta pr
+```
+
+### ✍️ Project Signatures (Local Config)
+You can now create a `.gta/config.json` file in your project root. This overrides global settings for everyone working on the project.
+
+**Great for teams:**
+- Enforce specific AI prompts (`aiCommitPrompt`).
+- Set custom branch prefixes.
+- Standardize commit thresholds.
+
+To generate one for your project:
+```bash
+gta init
+# Select "Yes" when asked to create project signature
+```
 
 ## ⚙️ Configuration
 
