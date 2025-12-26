@@ -180,6 +180,11 @@ async function smartWatch() {
       lastChangeDetected = now;
       lastChangeSize = size;
       activityLogger.info(`📝 Change detected: ${size} lines`);
+
+      // DEBUG: Log what actually changed
+      const { stdout: status } = await execa('git', ['status', '--porcelain']);
+      console.log(pc.dim('  Changes:\n' + status.split('\n').map(l => '  ' + l).join('\n')));
+
       broadcastSSE({
         type: 'watch_status',
         status: 'change_detected',
