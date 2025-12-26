@@ -56,10 +56,28 @@ async function findAvailablePort(startPort = 3000) {
 
 // Start cloudflared tunnel
 async function startCloudflaredTunnel(port) {
+  // Pre-check if cloudflared exists
+  try {
+    await execa('which', ['cloudflared']);
+  } catch {
+    console.log(pc.yellow('\n  ⚠️  cloudflared not found'));
+    console.log(pc.dim('  Install with: brew install cloudflared'));
+    console.log(pc.dim('  Or visit: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/\n'));
+    return;
+  }
+
   try {
     console.log(pc.dim('  Starting cloudflared tunnel...'));
 
+    // We don't await this because it's a long-running process
     cloudflaredProcess = execa('cloudflared', ['tunnel', '--url', `http://localhost:${port}`]);
+
+    // Catch unhandled rejections (failed start) to prevent crash
+    cloudflaredProcess.catch(err => {
+      if (!err.killed && !err.message.includes('SIGTERM')) {
+        activityLogger.error('Cloudflared exited unexpectedly', { error: err.message });
+      }
+    });
 
     // Listen to output to catch the tunnel URL
     cloudflaredProcess.stdout.on('data', (data) => {
@@ -80,17 +98,7 @@ async function startCloudflaredTunnel(port) {
       const output = data.toString();
       // Only show errors, not info messages
       if (output.includes('ERR') || output.includes('error')) {
-        console.error(pc.red(`  Cloudflared: ${output.trim()}`));
-      }
-    });
-
-    cloudflaredProcess.on('error', (error) => {
-      if (error.code === 'ENOENT') {
-        console.log(pc.yellow('\n  ⚠️  cloudflared not found'));
-        console.log(pc.dim('  Install with: brew install cloudflared'));
-        console.log(pc.dim('  Or visit: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/\n'));
-      } else {
-        console.error(pc.red(`  Cloudflared error: ${error.message}`));
+        // console.error(pc.red(`  Cloudflared: ${output.trim()}`));
       }
     });
 
@@ -187,7 +195,7 @@ async function smartWatch() {
         status: 'unstable',
         size,
         elapsed: Math.floor(timeSinceLastChange / 1000),
-        message: `Stabilizing... ${Math.floor(timeSinceLastChange/1000)}s`
+        message: `Stabilizing... ${Math.floor(timeSinceLastChange / 1000)}s`
       });
       return;
     }
@@ -712,7 +720,7 @@ export function webCommand(program) {
           // Prefer tunnel URL if available, otherwise local
           const url = tunnelUrl || `http://localhost:${port}`;
           const command = process.platform === 'darwin' ? 'open' :
-                         process.platform === 'win32' ? 'start' : 'xdg-open';
+            process.platform === 'win32' ? 'start' : 'xdg-open';
 
           // Wait a bit for tunnel URL to be ready
           setTimeout(() => {
