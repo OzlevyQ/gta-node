@@ -121,12 +121,13 @@ async function backgroundWatch() {
         console.log(pc.dim('Returning to menu...\n'));
 
         // Brief delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
-        // Reset and return
+        // Reset and restart watch
         lastChangeDetected = null;
         lastChangeSize = 0;
         isProcessing = false;
+        startBackgroundWatch();  // CRITICAL: restart watch
         return;
       }
 
@@ -180,13 +181,14 @@ async function backgroundWatch() {
       console.log(pc.dim('\nReturning to menu...\n'));
 
       // Brief delay to let user see the message
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Reset state - menu will continue naturally
+      // Reset state and restart watch to keep menu alive
       lastChangeDetected = null;
       lastChangeSize = 0;
       isProcessing = false;
       watchStartTime = Date.now();
+      startBackgroundWatch();  // CRITICAL: restart watch
 
     } else if (cfg.autoMode === 'auto') {
       // AUTO MODE - Commit automatically
