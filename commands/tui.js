@@ -119,12 +119,13 @@ async function backgroundWatch() {
       if (isCancel(shouldCommit) || !shouldCommit) {
         console.log(pc.yellow('\n✗ Commit cancelled\n'));
 
-        // Wait for acknowledgment
-        await text({
+        // Wait for acknowledgment (handle cancel to prevent exit)
+        const cont = await text({
           message: 'Press Enter to continue...',
           placeholder: ''
         });
 
+        // If user cancels, just continue anyway
         // Reset state - don't restart watch, just return to menu
         lastChangeDetected = null;
         lastChangeSize = 0;
@@ -150,7 +151,11 @@ async function backgroundWatch() {
             message = `${timestamp} ${message}`;
             s.stop(pc.green(`✓ Generated: "${message}"`));
           } catch (error) {
-            s.stop(pc.yellow('⚠ AI failed, using default'));
+            s.stop(pc.red('✗ AI generation failed'));
+            console.log(pc.yellow(`   Error: ${error.message}`));
+            if (error.cause) {
+              console.log(pc.dim(`   Cause: ${error.cause}`));
+            }
             message = `${timestamp} chore: update`;
           }
         } else {
@@ -175,12 +180,13 @@ async function backgroundWatch() {
         console.log(pc.yellow(`\n⚠ ${result.message}\n`));
       }
 
-      // Wait for acknowledgment
-      await text({
+      // Wait for acknowledgment (handle cancel to prevent exit)
+      const cont = await text({
         message: 'Press Enter to continue...',
         placeholder: ''
       });
 
+      // If user cancels (Ctrl+C), just continue anyway
       // Reset state - don't restart watch, menu will handle it
       lastChangeDetected = null;
       lastChangeSize = 0;
