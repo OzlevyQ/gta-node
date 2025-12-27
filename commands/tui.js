@@ -75,7 +75,7 @@ async function backgroundWatch() {
 
     // Still within stability period
     if (timeSinceLastChange < 3000) {
-      updateWatchStatusLine(pc.blue(`📝 Stabilizing... ${Math.floor(timeSinceLastChange/1000)}s (${size} lines)`));
+      updateWatchStatusLine(pc.blue(`📝 Stabilizing... ${Math.floor(timeSinceLastChange / 1000)}s (${size} lines)`));
       return;
     }
 
@@ -230,6 +230,7 @@ async function mainMenu() {
     }
   }
 }
+
 
 async function gitMenu() {
   while (true) {
@@ -790,7 +791,7 @@ async function webMenu() {
   // Open browser
   const url = `http://localhost:${port}`;
   const command = process.platform === 'darwin' ? 'open' :
-                 process.platform === 'win32' ? 'start' : 'xdg-open';
+    process.platform === 'win32' ? 'start' : 'xdg-open';
 
   setTimeout(() => {
     exec(`${command} ${url}`, (error) => {
@@ -869,6 +870,17 @@ export function tuiCommand(program) {
     .alias('run')
     .description('Launch interactive TUI with live watch status')
     .action(async () => {
+      // Acquire lock
+      const { acquireLock, releaseLock } = await import('../lib/lock.js');
+      const lock = acquireLock('tui');
+
+      if (!lock.acquired) {
+        console.log(pc.red(`\n❌ GTA is already running in this repository!`));
+        console.log(pc.dim(`   PID: ${lock.pid}`));
+        console.log(pc.dim(`   To ignore, delete .gta/tui.lock`));
+        process.exit(1);
+      }
+
       intro(pc.bgCyan(pc.black(' GTA Interactive Mode ')));
 
       // Start background watch
@@ -877,6 +889,7 @@ export function tuiCommand(program) {
       // Handle exit
       process.on('SIGINT', () => {
         stopBackgroundWatch();
+        releaseLock('tui');
         process.exit(0);
       });
 
@@ -884,6 +897,7 @@ export function tuiCommand(program) {
         await mainMenu();
       } finally {
         stopBackgroundWatch();
+        releaseLock('tui');
       }
     });
 }

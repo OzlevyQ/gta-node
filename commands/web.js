@@ -180,11 +180,6 @@ async function smartWatch() {
       lastChangeDetected = now;
       lastChangeSize = size;
       activityLogger.info(`📝 Change detected: ${size} lines`);
-
-      // DEBUG: Log what actually changed
-      const { stdout: status } = await execa('git', ['status', '--porcelain']);
-      console.log(pc.dim('  Changes:\n' + status.split('\n').map(l => '  ' + l).join('\n')));
-
       broadcastSSE({
         type: 'watch_status',
         status: 'change_detected',
@@ -692,6 +687,18 @@ export function webCommand(program) {
     .option('--no-watch', 'Do not start watch mode automatically')
     .option('--no-tunnel', 'Do not start cloudflared tunnel')
     .action(async (options) => {
+      // Check for lock
+      const { acquireLock, releaseLock } = await import('../lib/lock.js');
+      const lock = acquireLock('web', options.force);
+
+      if (!lock.acquired) {
+        console.log(pc.red(`\n❌ GTA Web is already running for this repository!`));
+        console.log(pc.white(`   PID: ${lock.pid}`));
+        console.log(pc.dim(`\n   To stop it, run: kill ${lock.pid}`));
+        console.log(pc.dim(`   To ignore this lock, run: gta web --force`));
+        process.exit(1);
+      }
+
       // Find available port
       const requestedPort = options.port ? parseInt(options.port) : 3000;
       const port = await findAvailablePort(requestedPort);
@@ -706,6 +713,7 @@ export function webCommand(program) {
         console.log(pc.green(`\n✓ GTA Web Interface running!`));
         console.log(pc.cyan(`  Local:  http://localhost:${port}`));
         console.log(pc.dim(`  Files:  ${webDir}`));
+        console.log(pc.dim(`  Repo:   ${process.cwd()}`));
 
         activityLogger.success(`Web server started on port ${port}`);
 
@@ -746,10 +754,11 @@ export function webCommand(program) {
       });
 
       // Handle shutdown
-      process.on('SIGINT', () => {
+      process.on('SIGINT', async () => {
         console.log(pc.yellow('\n\nShutting down server...'));
         stopWatchMode();
         stopCloudflaredTunnel();
+        releaseLock('web');
         server.close(() => {
           console.log(pc.green('✓ Server stopped'));
           if (tunnelUrl) {
