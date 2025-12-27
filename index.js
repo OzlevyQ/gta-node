@@ -7,7 +7,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
-// Middleware
+// Middleware 
 import { setupGhMiddleware } from './lib/gh-middleware.js';
 
 // Commands
