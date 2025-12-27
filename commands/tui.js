@@ -117,16 +117,13 @@ async function backgroundWatch() {
       });
 
       if (isCancel(shouldCommit) || !shouldCommit) {
-        console.log(pc.yellow('\n✗ Commit cancelled\n'));
+        console.log(pc.yellow('\n✗ Commit cancelled'));
+        console.log(pc.dim('Returning to menu...\n'));
 
-        // Wait for acknowledgment (handle cancel to prevent exit)
-        const cont = await text({
-          message: 'Press Enter to continue...',
-          placeholder: ''
-        });
+        // Brief delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // If user cancels, just continue anyway
-        // Reset state - don't restart watch, just return to menu
+        // Reset and return
         lastChangeDetected = null;
         lastChangeSize = 0;
         isProcessing = false;
@@ -175,19 +172,17 @@ async function backgroundWatch() {
 
       const result = await commitChanges(message);
       if (result.committed) {
-        console.log(pc.green(`\n✓ Committed: ${message}\n`));
+        console.log(pc.green(`\n✓ Committed: ${message}`));
       } else {
-        console.log(pc.yellow(`\n⚠ ${result.message}\n`));
+        console.log(pc.yellow(`\n⚠ ${result.message}`));
       }
 
-      // Wait for acknowledgment (handle cancel to prevent exit)
-      const cont = await text({
-        message: 'Press Enter to continue...',
-        placeholder: ''
-      });
+      console.log(pc.dim('\nReturning to menu...\n'));
 
-      // If user cancels (Ctrl+C), just continue anyway
-      // Reset state - don't restart watch, menu will handle it
+      // Brief delay to let user see the message
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Reset state - menu will continue naturally
       lastChangeDetected = null;
       lastChangeSize = 0;
       isProcessing = false;
