@@ -10,7 +10,6 @@ import { dirname, join } from 'path';
 // Middleware 
 import { setupGhMiddleware } from './lib/gh-middleware.js';
 
-// Commands
 import { initCommand } from './commands/init.js';
 import { statusCommand } from './commands/status.js';
 import { configCommand } from './commands/config.js';
