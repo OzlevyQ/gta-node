@@ -227,8 +227,24 @@ async function smartWatch() {
       });
     }
 
-    // Auto commit if in auto mode
-    if (cfg.autoMode === 'auto') {
+    // Process based on mode
+    if (cfg.autoMode === 'confirm') {
+      // CONFIRM MODE - Request approval via web UI
+      activityLogger.info(`📋 Awaiting confirmation for ${size} lines...`);
+
+      broadcastSSE({
+        type: 'commit_request',
+        size,
+        warnings,
+        message: `${size} lines ready - awaiting confirmation`
+      });
+
+      // Don't auto-commit - wait for user action
+      lastChangeDetected = null;
+      lastChangeSize = 0;
+      isProcessing = false;
+
+    } else if (cfg.autoMode === 'auto') {
       let message;
       const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
 
@@ -270,12 +286,19 @@ async function smartWatch() {
           }
         }
       }
-    }
 
-    lastChangeDetected = null;
-    lastChangeSize = 0;
-    isProcessing = false;
-    watchStartTime = Date.now();
+      lastChangeDetected = null;
+      lastChangeSize = 0;
+      isProcessing = false;
+      watchStartTime = Date.now();
+
+    } else {
+      // MANUAL MODE - Just notify
+      activityLogger.info(`⚠️ ${size} lines ready (mode: manual)`);
+      lastChangeDetected = null;
+      lastChangeSize = 0;
+      isProcessing = false;
+    }
 
   } catch (error) {
     activityLogger.error('Watch error', { error: error.message });

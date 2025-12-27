@@ -87,9 +87,103 @@ async function backgroundWatch() {
       return;
     }
 
-    // Auto commit if in auto mode
-    if (cfg.autoMode === 'auto') {
-      isProcessing = true;
+    // Process based on mode
+    isProcessing = true;
+
+    if (cfg.autoMode === 'confirm') {
+      // CONFIRM MODE - Ask user for approval
+      stopBackgroundWatch(); // Temporarily stop watch
+
+      await showHeader();
+      console.log(pc.cyan(pc.bold('\n━━━ Commit Ready ━━━\n')));
+      console.log(pc.white(`  Changes detected: ${pc.yellow(size + ' lines')}`));
+      console.log(pc.dim(`  Mode: ${cfg.autoMode}\n`));
+
+      const { execa } = await import('execa');
+
+      const viewDiff = await confirm({
+        message: 'View diff before committing?',
+        initialValue: false,
+      });
+
+      if (viewDiff && !isCancel(viewDiff)) {
+        const { stdout } = await execa('git', ['diff', '--color=always']);
+        console.log('\n' + stdout + '\n');
+      }
+
+      const shouldCommit = await confirm({
+        message: 'Commit these changes?',
+        initialValue: true,
+      });
+
+      if (isCancel(shouldCommit) || !shouldCommit) {
+        console.log(pc.yellow('\n✗ Commit cancelled\n'));
+        console.log(pc.dim('Press Enter to return to menu...'));
+        await text({ message: '' });
+
+        // Reset state and resume watch
+        lastChangeDetected = null;
+        lastChangeSize = 0;
+        isProcessing = false;
+        startBackgroundWatch();
+        return;
+      }
+
+      // User approved - proceed with commit
+      const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+      let message;
+
+      if (cfg.aiCommitMessages && cfg.aiProvider !== 'none') {
+        const useAI = await confirm({
+          message: 'Generate commit message with AI?',
+          initialValue: true,
+        });
+
+        if (useAI && !isCancel(useAI)) {
+          const s = spinner();
+          s.start('Generating AI commit message...');
+          try {
+            message = await generateCommitMessage();
+            message = `${timestamp} ${message}`;
+            s.stop(pc.green(`✓ Generated: "${message}"`));
+          } catch (error) {
+            s.stop(pc.yellow('⚠ AI failed, using default'));
+            message = `${timestamp} chore: update`;
+          }
+        } else {
+          const customMessage = await text({
+            message: 'Commit message:',
+            placeholder: 'chore: update',
+          });
+          message = isCancel(customMessage) ? `${timestamp} chore: update` : customMessage;
+        }
+      } else {
+        const customMessage = await text({
+          message: 'Commit message:',
+          placeholder: 'chore: update',
+        });
+        message = isCancel(customMessage) ? `${timestamp} chore: update` : customMessage;
+      }
+
+      const result = await commitChanges(message);
+      if (result.committed) {
+        console.log(pc.green(`\n✓ Committed: ${message}\n`));
+      } else {
+        console.log(pc.yellow(`\n⚠ ${result.message}\n`));
+      }
+
+      console.log(pc.dim('Press Enter to return to menu...'));
+      await text({ message: '' });
+
+      // Reset and resume
+      watchStartTime = Date.now();
+      lastChangeDetected = null;
+      lastChangeSize = 0;
+      isProcessing = false;
+      startBackgroundWatch();
+
+    } else if (cfg.autoMode === 'auto') {
+      // AUTO MODE - Commit automatically
       updateWatchStatusLine(pc.cyan(`🚀 Processing ${size} lines...`));
 
       const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
@@ -119,13 +213,15 @@ async function backgroundWatch() {
 
       isProcessing = false;
     } else {
-      // Not in auto mode
+      // MANUAL MODE - Just notify
       updateWatchStatusLine(pc.yellow(`⚠️ ${size} lines ready (mode: ${cfg.autoMode})`));
       lastChangeDetected = null;
       lastChangeSize = 0;
+      isProcessing = false;
     }
   } catch (error) {
     // Silently handle errors in background
+    isProcessing = false;
   }
 }
 
