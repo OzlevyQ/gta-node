@@ -118,16 +118,20 @@ async function backgroundWatch() {
 
       if (isCancel(shouldCommit) || !shouldCommit) {
         console.log(pc.yellow('\n✗ Commit cancelled'));
-        console.log(pc.dim('Returning to menu...\n'));
+        console.log(pc.dim('Returning to menu...'));
 
-        // Brief delay
+        // Delay and refresh screen
         await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Refresh the screen to show menu again  
+        await showHeader();
+        console.log(pc.cyan(pc.bold('\n  ↓ Continue below to select from menu ↓\n')));
 
         // Reset and restart watch
         lastChangeDetected = null;
         lastChangeSize = 0;
         isProcessing = false;
-        startBackgroundWatch();  // CRITICAL: restart watch
+        startBackgroundWatch();
         return;
       }
 
@@ -178,17 +182,21 @@ async function backgroundWatch() {
         console.log(pc.yellow(`\n⚠ ${result.message}`));
       }
 
-      console.log(pc.dim('\nReturning to menu...\n'));
+      console.log(pc.dim('\nReturning to menu...'));
 
-      // Brief delay to let user see the message
+      // Delay and refresh screen
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Reset state and restart watch to keep menu alive
+      // Refresh the screen to show menu again
+      await showHeader();
+      console.log(pc.cyan(pc.bold('\n  ↓ Continue below to select from menu ↓\n')));
+
+      // Reset state and restart watch
       lastChangeDetected = null;
       lastChangeSize = 0;
       isProcessing = false;
       watchStartTime = Date.now();
-      startBackgroundWatch();  // CRITICAL: restart watch
+      startBackgroundWatch();
 
     } else if (cfg.autoMode === 'auto') {
       // AUTO MODE - Commit automatically
