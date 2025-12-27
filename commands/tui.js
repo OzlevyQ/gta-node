@@ -119,6 +119,12 @@ async function backgroundWatch() {
       if (isCancel(shouldCommit) || !shouldCommit) {
         console.log(pc.yellow('\n✗ Commit cancelled\n'));
 
+        // Wait for acknowledgment
+        await text({
+          message: 'Press Enter to continue...',
+          placeholder: ''
+        });
+
         // Reset state - don't restart watch, just return to menu
         lastChangeDetected = null;
         lastChangeSize = 0;
