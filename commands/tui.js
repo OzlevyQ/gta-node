@@ -118,19 +118,11 @@ async function backgroundWatch() {
 
       if (isCancel(shouldCommit) || !shouldCommit) {
         console.log(pc.yellow('\n✗ Commit cancelled\n'));
-        await text({
-          message: 'Press Enter to return to menu...',
-          placeholder: ''
-        });
 
-        // Clear screen and show header again
-        await showHeader();
-
-        // Reset state and resume watch
+        // Reset state - don't restart watch, just return to menu
         lastChangeDetected = null;
         lastChangeSize = 0;
         isProcessing = false;
-        startBackgroundWatch();
         return;
       }
 
@@ -177,21 +169,11 @@ async function backgroundWatch() {
         console.log(pc.yellow(`\n⚠ ${result.message}\n`));
       }
 
-      // Wait for user to acknowledge
-      const continueKey = await text({
-        message: 'Press Enter to return to menu...',
-        placeholder: ''
-      });
-
-      // Clear screen and show header again
-      await showHeader();
-
-      // Reset and resume
-      watchStartTime = Date.now();
+      // Reset state - don't restart watch, menu will handle it
       lastChangeDetected = null;
       lastChangeSize = 0;
       isProcessing = false;
-      startBackgroundWatch();
+      watchStartTime = Date.now();
 
     } else if (cfg.autoMode === 'auto') {
       // AUTO MODE - Commit automatically
