@@ -995,8 +995,16 @@ export function tuiCommand(program) {
 
       intro(pc.bgCyan(pc.black(' GTA Interactive Mode ')));
 
-      // Start background watch
-      startBackgroundWatch();
+      // Only start background watch in auto mode
+      // In confirm mode, it interferes with the menu
+      const cfg = config.getAll();
+      if (cfg.autoMode === 'auto') {
+        startBackgroundWatch();
+        console.log(pc.green('  ✓ Auto-watch enabled'));
+      } else {
+        console.log(pc.yellow(`  ⓘ Watch disabled in ${cfg.autoMode} mode - use Git menu to commit`));
+      }
+      console.log();
 
       // Handle exit
       process.on('SIGINT', () => {
