@@ -91,8 +91,8 @@ async function backgroundWatch() {
     isProcessing = true;
 
     if (cfg.autoMode === 'confirm') {
-      // CONFIRM MODE - Ask user for approval
-      stopBackgroundWatch(); // Temporarily stop watch
+      // CONFIRM MODE - DON'T stop watch, just show prompts
+      // The watch keeps running in background
 
       await showHeader();
       console.log(pc.cyan(pc.bold('\n━━━ Commit Ready ━━━\n')));
@@ -117,21 +117,12 @@ async function backgroundWatch() {
       });
 
       if (isCancel(shouldCommit) || !shouldCommit) {
-        console.log(pc.yellow('\n✗ Commit cancelled'));
-        console.log(pc.dim('Returning to menu...'));
+        console.log(pc.yellow('\n✗ Commit cancelled\n'));
 
-        // Delay and refresh screen
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // Refresh the screen to show menu again  
-        await showHeader();
-        console.log(pc.cyan(pc.bold('\n  ↓ Continue below to select from menu ↓\n')));
-
-        // Reset and restart watch
+        // Reset state - watch keeps running
         lastChangeDetected = null;
         lastChangeSize = 0;
         isProcessing = false;
-        startBackgroundWatch();
         return;
       }
 
@@ -177,26 +168,16 @@ async function backgroundWatch() {
 
       const result = await commitChanges(message);
       if (result.committed) {
-        console.log(pc.green(`\n✓ Committed: ${message}`));
+        console.log(pc.green(`\n✓ Committed: ${message}\n`));
       } else {
-        console.log(pc.yellow(`\n⚠ ${result.message}`));
+        console.log(pc.yellow(`\n⚠ ${result.message}\n`));
       }
 
-      console.log(pc.dim('\nReturning to menu...'));
-
-      // Delay and refresh screen
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Refresh the screen to show menu again
-      await showHeader();
-      console.log(pc.cyan(pc.bold('\n  ↓ Continue below to select from menu ↓\n')));
-
-      // Reset state and restart watch
+      // Reset state - watch keeps running  
       lastChangeDetected = null;
       lastChangeSize = 0;
       isProcessing = false;
       watchStartTime = Date.now();
-      startBackgroundWatch();
 
     } else if (cfg.autoMode === 'auto') {
       // AUTO MODE - Commit automatically
@@ -995,16 +976,8 @@ export function tuiCommand(program) {
 
       intro(pc.bgCyan(pc.black(' GTA Interactive Mode ')));
 
-      // Only start background watch in auto mode
-      // In confirm mode, it interferes with the menu
-      const cfg = config.getAll();
-      if (cfg.autoMode === 'auto') {
-        startBackgroundWatch();
-        console.log(pc.green('  ✓ Auto-watch enabled'));
-      } else {
-        console.log(pc.yellow(`  ⓘ Watch disabled in ${cfg.autoMode} mode - use Git menu to commit`));
-      }
-      console.log();
+      // Start background watch in all modes
+      startBackgroundWatch();
 
       // Handle exit
       process.on('SIGINT', () => {
