@@ -993,6 +993,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadWatchStatus();
   await loadDashboard();
 
-  // Auto-refresh dashboard every 10 seconds
-  setInterval(loadDashboard, 10000);
+  // Auto-refresh dashboard every 30 seconds (only when no modal is open)
+  setInterval(() => {
+    // Skip refresh if any modal is visible
+    const commitModal = document.getElementById('commit-modal');
+    const pushModal = document.getElementById('push-modal');
+    const recommendModal = document.getElementById('push-recommend-modal');
+
+    if (commitModal && !commitModal.classList.contains('hidden')) return;
+    if (pushModal && !pushModal.classList.contains('hidden')) return;
+    if (recommendModal && !recommendModal.classList.contains('hidden')) return;
+
+    loadDashboard();
+  }, 30000);
 });
