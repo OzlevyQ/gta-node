@@ -581,8 +581,10 @@ async function handleRequest(req, res) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message }));
       } catch (error) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: error.message, message: 'chore: update' }));
+        // AI failed - return fallback message (200 status)
+        activityLogger.warning(`AI failed: ${error.message}`);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'chore: update', error: error.message }));
       }
       return;
     }
