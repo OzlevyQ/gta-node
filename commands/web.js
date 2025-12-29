@@ -129,6 +129,7 @@ let watchStartTime = null;
 let lastChangeDetected = null;
 let lastChangeSize = 0;
 let isProcessing = false;
+let isPaused = false;  // Pause watch while waiting for user confirmation
 
 // Send SSE message to all clients
 function broadcastSSE(data) {
@@ -149,7 +150,7 @@ activityLogger.addListener((entry) => {
 
 // Smart watch mode with stability detection
 async function smartWatch() {
-  if (isProcessing) return;
+  if (isProcessing || isPaused) return;  // Skip if paused
 
   try {
     const cfg = config.getAll();
@@ -229,8 +230,9 @@ async function smartWatch() {
 
     // Process based on mode
     if (cfg.autoMode === 'confirm') {
-      // CONFIRM MODE - Request approval via web UI
-      activityLogger.info(`📋 Awaiting confirmation for ${size} lines...`);
+      // CONFIRM MODE - Pause watch and request approval via web UI
+      isPaused = true;  // PAUSE WATCH
+      activityLogger.info(`📋 Watch paused - awaiting confirmation for ${size} lines...`);
 
       broadcastSSE({
         type: 'commit_request',
@@ -239,9 +241,7 @@ async function smartWatch() {
         message: `${size} lines ready - awaiting confirmation`
       });
 
-      // Don't auto-commit - wait for user action
-      lastChangeDetected = null;
-      lastChangeSize = 0;
+      // Don't reset - wait for user action
       isProcessing = false;
 
     } else if (cfg.autoMode === 'auto') {
@@ -553,8 +553,28 @@ async function handleRequest(req, res) {
         activityLogger.info('No changes to commit');
       }
 
+      // Resume watch mode after commit
+      isPaused = false;
+      lastChangeDetected = null;
+      lastChangeSize = 0;
+      watchStartTime = Date.now();
+      activityLogger.info('👁️ Watch resumed');
+
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ...result, message }));
+      return;
+    }
+
+    // Resume watch after cancel (no commit)
+    if (url.pathname === '/api/watch/resume' && req.method === 'POST') {
+      isPaused = false;
+      lastChangeDetected = null;
+      lastChangeSize = 0;
+      watchStartTime = Date.now();
+      activityLogger.info('👁️ Watch resumed (commit cancelled)');
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true }));
       return;
     }
 

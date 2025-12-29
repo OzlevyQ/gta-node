@@ -837,9 +837,15 @@ async function confirmCommit() {
   }
 }
 
-function cancelCommit() {
+async function cancelCommit() {
   hideCommitModal();
-  showSuccess('Commit cancelled');
+  // Resume watch mode
+  try {
+    await postAPI('/watch/resume');
+  } catch (e) {
+    console.error('Failed to resume watch:', e);
+  }
+  showSuccess('Commit cancelled - watch resumed');
 }
 
 // =============================================================================
