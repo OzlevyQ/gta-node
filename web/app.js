@@ -801,12 +801,21 @@ async function generateAICommitMessage() {
   const input = document.getElementById('commit-message-input');
 
   btn.disabled = true;
-  btn.textContent = '...';
+  btn.textContent = '⏳';
 
   try {
     const result = await fetchAPI('/commit/message');
+    console.log('AI response:', result);  // Debug
+
+    // Check if there was an error but still got a message
+    if (result.error) {
+      console.warn('AI had error:', result.error);
+      showError(`AI: ${result.error} (using fallback)`);
+    }
+
     input.value = result.message || 'chore: update';
   } catch (error) {
+    console.error('AI fetch failed:', error);
     showError(`AI generation failed: ${error.message}`);
     input.value = 'chore: update';
   } finally {
