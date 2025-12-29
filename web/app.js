@@ -44,6 +44,9 @@ function connectSSE() {
       addLogEntry(data.log);
     } else if (data.type === 'push_request') {
       showPushModal(data.unpushedCount, data.summary);
+    } else if (data.type === 'commit_request') {
+      // Confirm mode - show commit confirmation modal
+      showCommitModal(data);
     } else if (data.type === 'watch_status') {
       updateWatchStatus(data);
     } else if (data.type === 'recommendations') {
@@ -732,6 +735,186 @@ async function confirmPush() {
 }
 
 // =============================================================================
+// Commit Confirmation Modal (Confirm Mode)
+// =============================================================================
+
+let pendingCommitData = null;
+
+async function showCommitModal(data) {
+  pendingCommitData = data;
+
+  const modal = document.getElementById('commit-modal');
+  const backdrop = document.getElementById('modal-backdrop');
+  const changesSize = document.getElementById('commit-changes-size');
+  const filesCount = document.getElementById('commit-files-count');
+  const diffViewer = document.getElementById('commit-diff');
+  const messageInput = document.getElementById('commit-message-input');
+
+  // Update info
+  changesSize.textContent = `${data.size} lines`;
+
+  // Clear previous state
+  messageInput.value = '';
+  diffViewer.innerHTML = '<div class="loading"><div class="spinner"></div> Loading diff...</div>';
+
+  // Show modal
+  modal.classList.remove('hidden');
+  backdrop.classList.remove('hidden');
+
+  // Load diff
+  try {
+    const diffData = await fetchAPI('/diff');
+    const diff = diffData.diff || 'No changes';
+
+    // Count files from diff
+    const fileMatches = diff.match(/diff --git/g);
+    filesCount.textContent = `${fileMatches ? fileMatches.length : 0} files`;
+
+    // Format diff with colors
+    diffViewer.innerHTML = formatDiff(diff);
+  } catch (error) {
+    diffViewer.textContent = 'Failed to load diff';
+  }
+}
+
+function formatDiff(diff) {
+  return diff.split('\n').map(line => {
+    if (line.startsWith('+') && !line.startsWith('+++')) {
+      return `<span class="diff-add">${escapeHtml(line)}</span>`;
+    } else if (line.startsWith('-') && !line.startsWith('---')) {
+      return `<span class="diff-remove">${escapeHtml(line)}</span>`;
+    } else if (line.startsWith('diff --git') || line.startsWith('@@')) {
+      return `<span class="diff-header">${escapeHtml(line)}</span>`;
+    }
+    return escapeHtml(line);
+  }).join('\n');
+}
+
+function hideCommitModal() {
+  document.getElementById('commit-modal').classList.add('hidden');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+  pendingCommitData = null;
+}
+
+async function generateAICommitMessage() {
+  const btn = document.getElementById('generate-ai-message-btn');
+  const input = document.getElementById('commit-message-input');
+
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const result = await fetchAPI('/commit/message');
+    input.value = result.message || 'chore: update';
+  } catch (error) {
+    showError(`AI generation failed: ${error.message}`);
+    input.value = 'chore: update';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🤖 AI';
+  }
+}
+
+async function confirmCommit() {
+  const input = document.getElementById('commit-message-input');
+  const message = input.value.trim() || 'chore: update';
+
+  hideCommitModal();
+
+  try {
+    const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+    const fullMessage = `${timestamp} ${message}`;
+
+    const result = await postAPI('/commit', { message: fullMessage });
+    await loadDashboard();
+    showSuccess(`Committed: ${fullMessage}`);
+
+    // Show push recommendation  
+    await showPushRecommendation(fullMessage);
+
+  } catch (error) {
+    showError(`Commit failed: ${error.message}`);
+  }
+}
+
+function cancelCommit() {
+  hideCommitModal();
+  showSuccess('Commit cancelled');
+}
+
+// =============================================================================
+// Push Recommendation Modal
+// =============================================================================
+
+async function showPushRecommendation(commitMessage) {
+  const modal = document.getElementById('push-recommend-modal');
+  const backdrop = document.getElementById('modal-backdrop');
+  const recommendBox = document.getElementById('push-recommendation');
+  const summaryBox = document.getElementById('last-commit-summary');
+
+  // Show modal with loading
+  modal.classList.remove('hidden');
+  backdrop.classList.remove('hidden');
+
+  recommendBox.innerHTML = '<div class="loading"><div class="spinner"></div> Analyzing...</div>';
+  summaryBox.textContent = `Last commit: ${commitMessage}`;
+
+  try {
+    // Get unpushed count and analyze
+    const status = await fetchAPI('/status');
+    const unpushedCount = status.repo?.unpushedCount || 0;
+
+    // Simple recommendation logic
+    let shouldPush = false;
+    let reason = '';
+
+    if (unpushedCount >= 5) {
+      shouldPush = true;
+      reason = `You have ${unpushedCount} unpushed commits. It's recommended to push to avoid losing work.`;
+    } else if (unpushedCount >= 3) {
+      shouldPush = true;
+      reason = `You have ${unpushedCount} commits. Consider pushing to keep your remote up to date.`;
+    } else {
+      shouldPush = false;
+      reason = `Only ${unpushedCount} commit(s) pending. You can continue working and push later.`;
+    }
+
+    recommendBox.className = `recommendation-box ${shouldPush ? 'recommend-push' : 'recommend-wait'}`;
+    recommendBox.innerHTML = `
+      <div class="recommendation-title">${shouldPush ? '🚀 Recommended: Push Now' : '⏳ Recommendation: Wait'}</div>
+      <div class="recommendation-reason">${reason}</div>
+      <div class="mt-2">Unpushed commits: ${unpushedCount}</div>
+    `;
+
+  } catch (error) {
+    recommendBox.className = 'recommendation-box recommend-wait';
+    recommendBox.innerHTML = '<div class="recommendation-title">Could not analyze</div>';
+  }
+}
+
+function hidePushRecommendModal() {
+  document.getElementById('push-recommend-modal').classList.add('hidden');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+}
+
+async function pushNow() {
+  hidePushRecommendModal();
+
+  try {
+    await postAPI('/push');
+    await loadDashboard();
+    showSuccess('Changes pushed successfully!');
+  } catch (error) {
+    showError(`Push failed: ${error.message}`);
+  }
+}
+
+function pushLater() {
+  hidePushRecommendModal();
+  showSuccess('You can push later from the Git menu');
+}
+
+// =============================================================================
 // Notifications
 // =============================================================================
 
@@ -788,6 +971,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Push modal buttons
   document.getElementById('push-cancel').addEventListener('click', hidePushModal);
   document.getElementById('push-confirm').addEventListener('click', confirmPush);
+
+  // Commit confirmation modal buttons (confirm mode)
+  document.getElementById('commit-modal-close').addEventListener('click', hideCommitModal);
+  document.getElementById('commit-cancel').addEventListener('click', cancelCommit);
+  document.getElementById('commit-confirm').addEventListener('click', confirmCommit);
+  document.getElementById('generate-ai-message-btn').addEventListener('click', generateAICommitMessage);
+
+  // Push recommendation modal buttons
+  document.getElementById('push-later').addEventListener('click', pushLater);
+  document.getElementById('push-now').addEventListener('click', pushNow);
+
+  // Modal backdrop click to close
+  document.getElementById('modal-backdrop').addEventListener('click', () => {
+    hideCommitModal();
+    hidePushRecommendModal();
+    hidePushModal();
+  });
 
   // Load initial data
   await loadWatchStatus();

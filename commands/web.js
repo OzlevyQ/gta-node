@@ -518,24 +518,33 @@ async function handleRequest(req, res) {
         return;
       }
 
-      activityLogger.git('Creating commit...');
+      // Get message from request body if provided
+      let body = '';
+      for await (const chunk of req) {
+        body += chunk;
+      }
+      const data = body ? JSON.parse(body) : {};
 
-      const cfg = config.getAll();
-      let message;
+      let message = data.message;
 
-      if (cfg.aiCommitMessages && cfg.aiProvider !== 'none') {
-        try {
-          activityLogger.ai('Generating commit message with AI...');
-          message = await generateCommitMessage();
-          activityLogger.ai(`Generated: "${message}"`);
-        } catch (error) {
-          activityLogger.warning('AI generation failed, using fallback');
+      // If no message provided, generate one
+      if (!message) {
+        const cfg = config.getAll();
+        if (cfg.aiCommitMessages && cfg.aiProvider !== 'none') {
+          try {
+            activityLogger.ai('Generating commit message with AI...');
+            message = await generateCommitMessage();
+            activityLogger.ai(`Generated: "${message}"`);
+          } catch (error) {
+            activityLogger.warning('AI generation failed, using fallback');
+            message = `chore: update ${new Date().toISOString().split('T')[0]}`;
+          }
+        } else {
           message = `chore: update ${new Date().toISOString().split('T')[0]}`;
         }
-      } else {
-        message = `chore: update ${new Date().toISOString().split('T')[0]}`;
       }
 
+      activityLogger.git(`Creating commit: ${message}`);
       const result = await commitChanges(message);
 
       if (result.committed) {
@@ -545,7 +554,36 @@ async function handleRequest(req, res) {
       }
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(result));
+      res.end(JSON.stringify({ ...result, message }));
+      return;
+    }
+
+    // Get git diff
+    if (url.pathname === '/api/diff' && req.method === 'GET') {
+      try {
+        const { execa } = await import('execa');
+        const { stdout } = await execa('git', ['diff']);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ diff: stdout }));
+      } catch (error) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ diff: '' }));
+      }
+      return;
+    }
+
+    // Generate commit message only (no commit)  
+    if (url.pathname === '/api/commit/message' && req.method === 'GET') {
+      try {
+        activityLogger.ai('Generating AI commit message...');
+        const message = await generateCommitMessage();
+        activityLogger.ai(`Generated: "${message}"`);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message }));
+      } catch (error) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: error.message, message: 'chore: update' }));
+      }
       return;
     }
 

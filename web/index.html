@@ -290,6 +290,69 @@
     </div>
   </div>
 
+  <!-- Modal for commit confirmation (confirm mode) -->
+  <div id="commit-modal" class="modal hidden">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 Commit Ready</h3>
+        <span class="modal-close" id="commit-modal-close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="commit-info">
+          <div class="info-row">
+            <span class="info-label">Changes detected:</span>
+            <span class="info-value" id="commit-changes-size">0 lines</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Files modified:</span>
+            <span class="info-value" id="commit-files-count">0 files</span>
+          </div>
+        </div>
+        
+        <div class="diff-container">
+          <h4>📄 Diff Preview</h4>
+          <pre class="diff-viewer" id="commit-diff"></pre>
+        </div>
+
+        <div class="commit-options">
+          <div class="form-group">
+            <label class="form-label">Commit Message</label>
+            <div class="input-group">
+              <input type="text" class="input" id="commit-message-input" placeholder="Enter commit message or use AI...">
+              <button class="btn btn-secondary" id="generate-ai-message-btn" title="Generate with AI">🤖 AI</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" id="commit-cancel">Cancel</button>
+        <button class="btn btn-success" id="commit-confirm">✓ Commit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for post-commit push recommendation -->
+  <div id="push-recommend-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🚀 Push Recommendation</h3>
+      </div>
+      <div class="modal-body">
+        <div class="recommendation-box" id="push-recommendation">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+        <div class="commit-summary" id="last-commit-summary"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="push-later">Later</button>
+        <button class="btn btn-success" id="push-now">Push Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal backdrop -->
+  <div id="modal-backdrop" class="modal-backdrop hidden"></div>
+
   <script src="/app.js"></script>
 </body>
 </html>
