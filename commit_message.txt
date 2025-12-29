@@ -1,0 +1,1 @@
+chore(env): initial environment setup for CLI
