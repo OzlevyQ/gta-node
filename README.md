@@ -201,8 +201,62 @@ GTA 2.1 is open-source software licensed under the **MIT License**.
 
 ---
 
+## 👨‍💻 Created By
+
 <p align="center">
-  Built with ❤️ by the GTA Team. 
+  <img src="https://img.shields.io/badge/Made%20with-❤️-red?style=for-the-badge" alt="Made with Love">
+  <img src="https://img.shields.io/badge/Powered%20by-AI-purple?style=for-the-badge" alt="AI Powered">
+</p>
+
+### **Oz Levy** — Full-Stack Developer & Automation Enthusiast
+
+> *"Automate the boring, focus on the code."*
+
+Building tools that help developers work smarter, not harder. GTA is the culmination of years of experience automating development workflows and integrating AI into everyday tasks.
+
+---
+
+## 🌐 Connect & Contribute
+
+<p align="center">
+  <a href="https://github.com/OzlevyQ">
+    <img src="https://img.shields.io/badge/GitHub-OzlevyQ-181717?style=for-the-badge&logo=github" alt="GitHub">
+  </a>
+  <a href="https://linkedin.com/in/ozlevypmo">
+    <img src="https://img.shields.io/badge/LinkedIn-ozlevypmo-0077B5?style=for-the-badge&logo=linkedin" alt="LinkedIn">
+  </a>
+  <a href="https://wa.me/972548203249">
+    <img src="https://img.shields.io/badge/WhatsApp-Chat-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp">
+  </a>
+  <a href="mailto:ozlevy@yadbarzel.co.il">
+    <img src="https://img.shields.io/badge/Email-Contact-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email">
+  </a>
+</p>
+
+---
+
+## ⭐ Support the Project
+
+If GTA helped you save time, consider:
+
+- ⭐ **Star this repo** — It helps others discover the project
+- 🐛 **Report issues** — Help us improve
+- 🔀 **Submit PRs** — Contributions are welcome!
+- 📣 **Share with friends** — Spread the word
+
+<p align="center">
+  <a href="https://github.com/OzlevyQ/gta-node">
+    <img src="https://img.shields.io/github/stars/OzlevyQ/gta-node?style=social" alt="GitHub Stars">
+  </a>
+  <a href="https://github.com/OzlevyQ/gta-node/fork">
+    <img src="https://img.shields.io/github/forks/OzlevyQ/gta-node?style=social" alt="GitHub Forks">
+  </a>
+</p>
+
+---
+
+<p align="center">
+  <strong>GTA 2.1</strong> — The Developer's Automation Companion
   <br>
-  <i>"Automate the boring, focus on the code."</i>
+  <sub>© 2024 Oz Levy. Open Source under MIT License.</sub>
 </p>
